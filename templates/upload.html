@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Classifier</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a202c;
+        }
+        .file {
+            visibility: hidden;
+            position: absolute;
+        }
+        .main {
+            display: flex;
+            padding: 4px;
+            gap: 10px;
+            background: #fff;
+            border-radius: 10px;
+        }
+        .form-control {
+            margin: 2px 0px 2px 10px;
+            padding: 2px 10px;
+            border-radius: 10px 0 0 10px;
+        }
+        .btn {
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen">
+    <div class="text-center flex flex-col justify-center items-center">
+        <h1 class="text-white text-3xl font-bold mb-4">Upload an Image</h1>
+        <form method="post" enctype="multipart/form-data" class="mb-4">
+            <div class="input-group my-3 main">
+                <input type="text" class="form-control" placeholder="Upload File" id="file-text" readonly>
+                <div class="input-group-append">
+                    <button type="button" class="browse btn bg-blue-500 hover:bg-blue-700 text-white font-bold">Browse...</button>
+                </div>
+            </div>
+            <input type="file" name="file" class="file hidden" accept="image/*" onchange="previewFile()">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Upload
+            </button>
+        </form>
+        <img id="preview" src="#" alt="Image Preview" class="hidden max-w-xs">
+        {% if result %}
+        <h2 class="text-white text-xl mt-4" id="result">Result: {{ result }}</h2>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var imageData = localStorage.getItem("uploadedImage");
+            if (imageData) {
+                document.getElementById('preview').src = imageData;
+                document.getElementById('preview').classList.remove('hidden');
+            }
+        });
+
+        document.querySelector('.browse').addEventListener('click', function() {
+            document.querySelector('.file').click();
+        });
+
+        document.querySelector('.file').addEventListener('change', function(e) {
+            var fileName = e.target.files[0].name;
+            document.getElementById('file-text').value = fileName;
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var preview = document.getElementById('preview');
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                localStorage.setItem("uploadedImage", e.target.result);
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        function previewFile() {
+            var preview = document.getElementById('preview');
+            var file = document.querySelector('.file').files[0];
+            var reader = new FileReader();
+
+            reader.onloadend = function () {
+                preview.src = reader.result;
+                preview.classList.remove('hidden');
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = "";
+                preview.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
